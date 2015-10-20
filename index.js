@@ -9,6 +9,11 @@ apiV1.get('/', (request, response) => {
   response.status(501).json(null);
 });
 
+apiV1.use((error, _request, response, _next) => {
+  console.error(error);
+  response.status(500).json(null);
+});
+
 // API
 
 const api = express.Router();
