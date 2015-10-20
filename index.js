@@ -3,6 +3,7 @@
 const express = require('express');
 const knex = require('knex');
 const morgan = require('morgan');
+const rawBody = require('raw-body');
 const uuid = require('uuid');
 
 // Configuration
@@ -35,22 +36,36 @@ apiV1.get('/recordings', (request, response) => {
     });
 });
 
-apiV1.post('/recordings', (request, response) => {
-  const guid = uuid.v4();
-  db('recordings')
-    .insert({
-      guid: guid,
-      latitude: request.query.latitude,
-      longitude: request.query.longitude
-    })
-    .then(() => {
-      console.log(arguments);
-      response.status(201).location(guid).json(null);
-    })
-    .catch((_error) => {
-      response.status(400).json(null);
+apiV1.post('/recordings',
+  (request, _response, next) => {
+    rawBody(request, {
+      length: request.headers['Content-Length'],
+      limit: '10mb'
+    }, (error, data) => {
+      if (error) {
+        return next(error);
+      }
+      request.rawBody = data;
+      next();
     });
-});
+  },
+  (request, response) => {
+    const guid = uuid.v4();
+    db('recordings')
+      .insert({
+        guid: guid,
+        latitude: request.query.latitude,
+        longitude: request.query.longitude
+      })
+      .then(() => {
+        console.log(arguments);
+        response.status(201).location(guid).json(null);
+      })
+      .catch((_error) => {
+        response.status(400).json(null);
+      });
+  }
+);
 
 apiV1.get(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/, (request, response) => {
   db('recordings')
