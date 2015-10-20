@@ -5,7 +5,8 @@
     "npm": "^2.14.7"
   },
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "morgan": "^1.6.1"
   },
   "scripts": {
     "start": "node index.js"
