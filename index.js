@@ -4,12 +4,14 @@ const express = require('express');
 const knex = require('knex');
 const morgan = require('morgan');
 
+// Configuration
+
+const DB_URL = process.env.DATABASE_URL || 'postgresql://localhost/';
+const PORT = process.env.PORT || 8888;
+
 // Database
 
-const db = knex({
-  client: 'pg',
-  connection: process.env.DATABASE_URL || 'postgresql://localhost/'
-});
+const db = knex({ client: 'pg', connection: DB_URL });
 
 // API v1
 
@@ -45,7 +47,6 @@ app.use('/api', api);
 
 // Server
 
-const port = process.env.PORT || 8888;
-const server = app.listen(port, () => {
+const server = app.listen(PORT, () => {
   console.log('Listening on port ' + server.address().port + '...');
 });
