@@ -1,5 +1,6 @@
 'use strict';
 
+const aws = require('aws-sdk');
 const express = require('express');
 const knex = require('knex');
 const morgan = require('morgan');
@@ -9,11 +10,20 @@ const uuid = require('uuid');
 // Configuration
 
 const DB_CONFIG = require('./knexfile');
+// AWS_ACCESS_KEY_ID
+// AWS_SECRET_ACCESS_KEY
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+const S3_BUCKET = process.env.S3_BUCKET;
 const PORT = process.env.PORT || 8888;
 
 // Database
 
 const db = knex(DB_CONFIG);
+
+// AWS
+
+aws.config.region = AWS_REGION;
+const s3 = new aws.S3({ params: { Bucket: S3_BUCKET } });
 
 // API v1
 
@@ -51,19 +61,22 @@ apiV1.post('/recordings',
   },
   (request, response) => {
     const guid = uuid.v4();
-    db('recordings')
-      .insert({
-        guid: guid,
-        latitude: request.query.latitude,
-        longitude: request.query.longitude
-      })
-      .then(() => {
-        console.log(arguments);
-        response.status(201).location(guid).json(null);
-      })
-      .catch((_error) => {
-        response.status(400).json(null);
-      });
+    s3.upload({ Body: request.rawBody, Key: guid }, (error, _data) => {
+      if (error) { throw error; }
+      db('recordings')
+        .insert({
+          guid: guid,
+          latitude: request.query.latitude,
+          longitude: request.query.longitude
+        })
+        .then(() => {
+          console.log(arguments);
+          response.status(201).location(guid).json(null);
+        })
+        .catch((_error) => {
+          response.status(400).json(null);
+        });
+    });
   }
 );
 
