@@ -25,6 +25,21 @@ const db = knex(DB_CONFIG);
 aws.config.region = AWS_REGION;
 const s3 = new aws.S3({ params: { Bucket: S3_BUCKET } });
 
+// Helpers
+
+const getRawBody = (request, _response, next) => {
+  rawBody(request, {
+    length: request.headers['Content-Length'],
+    limit: '10mb'
+  }, (error, data) => {
+    if (error) {
+      return next(error);
+    }
+    request.rawBody = data;
+    next();
+  });
+};
+
 // API v1
 
 const apiV1 = express.Router();
@@ -46,39 +61,25 @@ apiV1.get('/recordings', (request, response) => {
     });
 });
 
-apiV1.post('/recordings',
-  (request, _response, next) => {
-    rawBody(request, {
-      length: request.headers['Content-Length'],
-      limit: '10mb'
-    }, (error, data) => {
-      if (error) {
-        return next(error);
-      }
-      request.rawBody = data;
-      next();
-    });
-  },
-  (request, response) => {
-    const guid = uuid.v4();
-    s3.upload({ Body: request.rawBody, Key: guid }, (error, _data) => {
-      if (error) { throw error; }
-      db('recordings')
-        .insert({
-          guid: guid,
-          latitude: request.query.latitude,
-          longitude: request.query.longitude
-        })
-        .then(() => {
-          console.log(arguments);
-          response.status(201).location(guid).json(null);
-        })
-        .catch((_error) => {
-          response.status(400).json(null);
-        });
-    });
-  }
-);
+apiV1.post('/recordings', getRawBody, (request, response) => {
+  const guid = uuid.v4();
+  s3.upload({ Body: request.rawBody, Key: guid }, (error, _data) => {
+    if (error) { throw error; }
+    db('recordings')
+      .insert({
+        guid: guid,
+        latitude: request.query.latitude,
+        longitude: request.query.longitude
+      })
+      .then(() => {
+        console.log(arguments);
+        response.status(201).location(guid).json(null);
+      })
+      .catch((_error) => {
+        response.status(400).json(null);
+      });
+  });
+});
 
 apiV1.get(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/, (request, response) => {
   db('recordings')
