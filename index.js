@@ -1,7 +1,15 @@
 'use strict';
 
 const express = require('express');
+const knex = require('knex');
 const morgan = require('morgan');
+
+// Database
+
+const db = knex({
+  client: 'pg',
+  connection: process.env.DATABASE_URL || 'postgresql://localhost/'
+});
 
 // API v1
 

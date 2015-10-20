@@ -6,9 +6,12 @@
   },
   "dependencies": {
     "express": "^4.13.3",
-    "morgan": "^1.6.1"
+    "knex": "^0.8.6",
+    "morgan": "^1.6.1",
+    "pg": "^4.4.3"
   },
   "scripts": {
+    "db": "knex",
     "start": "node index.js"
   }
 }
