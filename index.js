@@ -5,6 +5,7 @@ const express = require('express');
 const knex = require('knex');
 const morgan = require('morgan');
 const rawBody = require('raw-body');
+const raygun = require('raygun');
 const uuid = require('uuid');
 
 // Configuration
@@ -14,6 +15,7 @@ const DB_CONFIG = require('./knexfile');
 // AWS_SECRET_ACCESS_KEY
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 const S3_BUCKET = process.env.S3_BUCKET;
+const RAYGUN_API_KEY = process.env.RAYGUN_APIKEY;
 const PORT = process.env.PORT || 8888;
 
 // Database
@@ -108,6 +110,8 @@ apiV1.delete(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-
 
 apiV1.use((error, _request, response, _next) => {
   console.error(error);
+  const client = new raygun.Client().init({ apiKey: RAYGUN_API_KEY });
+  client.send(error);
   response.status(500).json(null);
 });
 
