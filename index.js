@@ -10,7 +10,9 @@ const uuid = require('uuid');
 
 // Configuration
 
-const DB_CONFIG = require('./knexfile');
+const ENV = process.env.NODE_ENV || 'development';
+const DB_CONFIG = require('./knexfile')[ENV];
+console.log(DB_CONFIG);
 // AWS_ACCESS_KEY_ID
 // AWS_SECRET_ACCESS_KEY
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
