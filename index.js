@@ -3,6 +3,7 @@
 const express = require('express');
 const knex = require('knex');
 const morgan = require('morgan');
+const uuid = require('uuid');
 
 // Configuration
 
@@ -31,6 +32,23 @@ apiV1.get('/recordings', (request, response) => {
     .orderBy('created_at', 'desc')
     .then((recordings) => {
       response.json(recordings);
+    });
+});
+
+apiV1.post('/recordings', (request, response) => {
+  const guid = uuid.v4();
+  db('recordings')
+    .insert({
+      guid: guid,
+      latitude: request.query.latitude,
+      longitude: request.query.longitude
+    })
+    .then(() => {
+      console.log(arguments);
+      response.status(201).location(guid).json(null);
+    })
+    .catch((_error) => {
+      response.status(400).json(null);
     });
 });
 
