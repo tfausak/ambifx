@@ -6,12 +6,12 @@ const morgan = require('morgan');
 
 // Configuration
 
-const DB_URL = process.env.DATABASE_URL || 'postgresql://localhost/';
+const DB_CONFIG = require('./knexfile');
 const PORT = process.env.PORT || 8888;
 
 // Database
 
-const db = knex({ client: 'pg', connection: DB_URL });
+const db = knex(DB_CONFIG);
 
 // API v1
 
