@@ -1,10 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const api = express.Router();
-api.get('/', (request, response) => {
+const apiV1 = express.Router();
+apiV1.get('/', (request, response) => {
   response.status(501).json(null);
 });
+
+const api = express.Router();
+api.use('/v1', apiV1);
 
 const app = express();
 app.use(morgan('combined'));
