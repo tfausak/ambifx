@@ -49,6 +49,19 @@ apiV1.get(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-
     });
 });
 
+apiV1.delete(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/, (request, response) => {
+  db('recordings')
+    .where('guid', request.params[0])
+    .where('deleted_at', null)
+    .update('deleted_at', new Date())
+    .then((count) => {
+      if (count !== 1) {
+        return response.status(422).json(null);
+      }
+      response.status(204).json(null);
+    });
+});
+
 apiV1.use((error, _request, response, _next) => {
   console.error(error);
   response.status(500).json(null);
