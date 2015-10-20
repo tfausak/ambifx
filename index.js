@@ -37,15 +37,12 @@ apiV1.get('/recordings', (request, response) => {
 apiV1.get(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/, (request, response) => {
   db('recordings')
     .where('guid', request.params[0])
+    .where('deleted_at', null)
     .then((recordings) => {
       if (recordings.length !== 1) {
         return response.status(404).json(null);
       }
-      const recording = recordings[0];
-      if (recording.deleted_at) {
-        return response.status(410).json(null);
-      }
-      response.json(recording);
+      response.json(recordings[0]);
     });
 });
 
