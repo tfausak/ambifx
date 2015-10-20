@@ -5,6 +5,14 @@ const morgan = require('morgan');
 
 const apiV1 = express.Router();
 
+apiV1.use((request, response, next) => {
+  if (request.accepts('json')) {
+    next();
+  } else {
+    response.status(406).json(null);
+  }
+});
+
 apiV1.get('/', (request, response) => {
   response.status(501).json(null);
 });
