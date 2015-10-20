@@ -25,8 +25,13 @@ apiV1.use((request, response, next) => {
   }
 });
 
-apiV1.get('/', (request, response) => {
-  response.status(501).json(null);
+apiV1.get('/recordings', (request, response) => {
+  db('recordings')
+    .where('deleted_at', null)
+    .orderBy('created_at', 'desc')
+    .then((recordings) => {
+      response.json(recordings);
+    });
 });
 
 apiV1.use((error, _request, response, _next) => {
