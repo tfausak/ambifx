@@ -75,7 +75,6 @@ apiV1.post('/recordings', getRawBody, (request, response) => {
         longitude: request.query.longitude
       })
       .then(() => {
-        console.log(arguments);
         response.status(201).location(guid).json(null);
       })
       .catch((_error) => {
