@@ -55,7 +55,7 @@ apiV1.use((request, response, next) => {
   }
 });
 
-apiV1.get('/recordings', (request, response) => {
+apiV1.get('/recordings', (_request, response) => {
   db('recordings')
     .where('deleted_at', null)
     .orderBy('created_at', 'desc')

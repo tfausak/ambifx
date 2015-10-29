@@ -14,8 +14,12 @@
     "raygun": "0.7.1",
     "uuid": "2.0.1"
   },
+  "devDependencies": {
+    "eslint": "1.7.3"
+  },
   "scripts": {
     "db": "knex",
+    "lint": "eslint",
     "start": "node index.js"
   }
 }
