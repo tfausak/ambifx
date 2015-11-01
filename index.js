@@ -46,7 +46,6 @@ const getRawBody = (request, _response, next) => {
 const convertRecording = (recording) => {
   return {
     created_at: recording.created_at,
-    deleted_at: recording.deleted_at,
     guid: recording.guid,
     latitude: recording.latitude,
     longitude: recording.longitude,
