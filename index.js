@@ -136,6 +136,7 @@ api.use('/v1', apiV1);
 const app = express();
 app.use(morgan('combined'));
 app.use('/api', api);
+app.use(express.static('static'));
 
 // Server
 
