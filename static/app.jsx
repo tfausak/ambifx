@@ -31,20 +31,19 @@
 
   var Recordings = React.createClass({
     getInitialState: function () {
-      return {
-        recordings: [
-          {
-            created_at: new Date(),
-            guid: '12341234-1234-1234-1234-123412341234',
-            latitude: 48.8613854,
-            longitude: 2.3346815,
-            url: 'https://www.google.com'
-          }
-        ]
-      };
+      return { recordings: [] };
     },
 
-    componentDidMount: function () {},
+    componentDidMount: function () {
+      superagent.get('/api/v1/recordings').end(function (error, response) {
+        if (error) { return console.error(error); }
+        var recordings = response.body.map(function (recording) {
+          recording.created_at = new Date(recording.created_at);
+          return recording;
+        });
+        this.setState({ recordings: recordings });
+      }.bind(this));
+    },
 
     render: function () {
       return (
