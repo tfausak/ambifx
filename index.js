@@ -43,6 +43,17 @@ const getRawBody = (request, _response, next) => {
   });
 };
 
+const convertRecording = (recording) => {
+  return {
+    created_at: recording.created_at,
+    deleted_at: recording.deleted_at,
+    guid: recording.guid,
+    latitude: recording.latitude,
+    longitude: recording.longitude,
+    url: s3.getSignedUrl('getObject', { Key: recording.guid })
+  };
+};
+
 // API v1
 
 const apiV1 = express.Router();
@@ -60,7 +71,7 @@ apiV1.get('/recordings', (_request, response) => {
     .where('deleted_at', null)
     .orderBy('created_at', 'desc')
     .then((recordings) => {
-      response.json(recordings);
+      response.json(recordings.map(convertRecording));
     });
 });
 
@@ -91,7 +102,7 @@ apiV1.get(/\/recordings\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-
       if (recordings.length !== 1) {
         return response.status(404).json(null);
       }
-      response.json(recordings[0]);
+      response.json(convertRecording(recordings[0]));
     });
 });
 
